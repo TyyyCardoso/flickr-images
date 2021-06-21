@@ -7,7 +7,7 @@ import android.os.Build
 
 object Constants {
     //API KEY
-    const val APP_ID: String = "baaca7335fd6c06d8ed8e094ee6f642b"
+    const val APP_ID: String = "7bdb03d29144dbbabc9c71fd173ac356"
     const val BASE_URL : String = "https://api.flickr.com/services/rest/"
 
 
