@@ -1,16 +1,18 @@
 package azores.tyyy.cardoso.flickr_images.models
 
-data class FlickrModel(
+import java.io.Serializable
+
+data class PhotoSearchModel(
     val photos: Photos,
     val stat: String
-) {
+): Serializable {
     data class Photos(
         val page: Int,
         val pages: Int,
         val perpage: Int,
         val photo: List<Photo>,
         val total: Int
-    ) {
+    ): Serializable {
         data class Photo(
             val farm: Int,
             val id: String,
@@ -21,6 +23,6 @@ data class FlickrModel(
             val secret: String,
             val server: String,
             val title: String
-        )
+        ) : Serializable
     }
 }
