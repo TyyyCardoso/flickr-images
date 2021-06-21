@@ -1,16 +1,17 @@
-package azores.tyyy.cardoso.flickr_images
+package azores.tyyy.cardoso.flickr_images.activities
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import android.widget.AbsListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import azores.tyyy.cardoso.flickr_images.R
 import azores.tyyy.cardoso.flickr_images.adapter.ItemAdapter
 import azores.tyyy.cardoso.flickr_images.constants.Constants
 import azores.tyyy.cardoso.flickr_images.models.*
 import azores.tyyy.cardoso.flickr_images.network.PhotoSearchService
 import azores.tyyy.cardoso.flickr_images.network.PhotoSizesService
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,6 +22,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : AppCompatActivity() {
+
+    var page = 1
+    var isLoading = false
 
     var photoSearchList : PhotoSearchModel? = null
     var photoSizesList : PhotoSizesModel? = null
@@ -41,17 +45,42 @@ class MainActivity : AppCompatActivity() {
         // Adapter class is initialized and list is passed in the param.
         // adapter instance is set to the recyclerview to inflate the items.
         rvItemsList.adapter = itemAdapter
+
+        rvItemsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                if(dy > 0){
+                    val visibleItemCount = rvItemsList.childCount
+                    val pastVisibleItem = (rvItemsList.layoutManager as GridLayoutManager).findFirstCompletelyVisibleItemPosition()
+                    val total = itemAdapter.itemCount
+
+                    if(!isLoading){
+                        if((visibleItemCount + pastVisibleItem) >= total){
+                            page++
+                            getPhotoSearch()
+                        }
+                    }
+                }
+
+                super.onScrolled(recyclerView, dx, dy)
+
+            }
+        })
+
+
     }
 
     private fun getPhotoSearch(){
+        isLoading = true
         val retrofit : Retrofit = Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val service : PhotoSearchService = retrofit.create<PhotoSearchService>(PhotoSearchService::class.java)
+        
+        val listCall : Call<PhotoSearchModel> = service.getInfo(page)
 
-        val listCall : Call<PhotoSearchModel> = service.getInfo()
 
         listCall.enqueue(object : Callback<PhotoSearchModel> {
             override fun onResponse(call: Call<PhotoSearchModel>, response: Response<PhotoSearchModel>) {
@@ -102,5 +131,8 @@ class MainActivity : AppCompatActivity() {
 
             })
         }
+
+        isLoading=false
     }
+
 }

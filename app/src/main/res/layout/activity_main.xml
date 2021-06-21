@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".activities.MainActivity"
     android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -13,11 +13,9 @@
         android:layout_height="wrap_content"
         />
 
-    <!--
-    <ImageView
-        android:id="@+id/Img"
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="15dp" />
-            -->
+        android:layout_height="40dp"/>
+
 </LinearLayout>
