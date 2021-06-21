@@ -5,13 +5,13 @@ import java.io.Serializable
 data class PhotoSizesModel(
     val sizes: Sizes,
     val stat: String
-): Serializable {
+) : Serializable {
     data class Sizes(
         val canblog: Int,
         val candownload: Int,
         val canprint: Int,
         val size: List<Size>
-    ): Serializable {
+    ) : Serializable{
         data class Size(
             val height: Int,
             val label: String,
@@ -19,6 +19,6 @@ data class PhotoSizesModel(
             val source: String,
             val url: String,
             val width: Int
-        ): Serializable
+        ) : Serializable
     }
 }

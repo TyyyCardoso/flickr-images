@@ -5,14 +5,14 @@ import java.io.Serializable
 data class PhotoSearchModel(
     val photos: Photos,
     val stat: String
-): Serializable {
+) : Serializable {
     data class Photos(
         val page: Int,
         val pages: Int,
         val perpage: Int,
         val photo: List<Photo>,
         val total: Int
-    ): Serializable {
+ ) : Serializable {
         data class Photo(
             val farm: Int,
             val id: String,
