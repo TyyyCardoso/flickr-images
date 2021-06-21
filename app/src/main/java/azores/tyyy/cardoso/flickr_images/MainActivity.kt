@@ -1,5 +1,6 @@
 package azores.tyyy.cardoso.flickr_images
 
+import android.content.pm.ActivityInfo
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
@@ -33,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
         getPhotoSearch()
 
