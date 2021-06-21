@@ -10,6 +10,6 @@ import retrofit2.http.Query
 interface PhotoSearchService {
     @GET("?method=flickr.photos.search&api_key=${Constants.APP_ID}&tags=bird&nojsoncallback=1&format=json")
     fun getInfo(
-        @Query("page") page : Int,
-    ) : Call<PhotoSearchModel>
+        @Query("page") page: Int,
+    ): Call<PhotoSearchModel>
 }

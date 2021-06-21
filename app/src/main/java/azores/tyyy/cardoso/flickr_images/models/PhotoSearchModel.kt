@@ -12,7 +12,7 @@ data class PhotoSearchModel(
         val perpage: Int,
         val photo: List<Photo>,
         val total: Int
- ) : Serializable {
+    ) : Serializable {
         data class Photo(
             val farm: Int,
             val id: String,

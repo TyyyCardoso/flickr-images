@@ -1,6 +1,7 @@
 package azores.tyyy.cardoso.flickr_images.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,9 @@ import kotlinx.android.synthetic.main.items_row.view.*
 class ItemAdapter(val context: Context, val items: ArrayList<String>) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
 
+    var listURL = "1"
+
+    private var onClickListener: OnClickListener? = null
 
 
     /**
@@ -21,13 +25,13 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
      * {@link ViewHolder} and initializes some private fields to be used by RecyclerView.
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            return ViewHolder(
-                LayoutInflater.from(context).inflate(
-                    R.layout.items_row,
-                    parent,
-                    false
-                )
+        return ViewHolder(
+            LayoutInflater.from(context).inflate(
+                R.layout.items_row,
+                parent,
+                false
             )
+        )
 
     }
 
@@ -43,10 +47,21 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        
         Picasso.get().load(item).into(holder.tvItem)
-    }
 
+        holder.tvItem.setOnClickListener {
+            Log.i("WWT", "${item}")
+
+            onClickListener = onClickListener
+
+            if (onClickListener != null) {
+                onClickListener!!.onClick(position, item)
+                Log.i("WWT2", "${item}")
+
+            }
+        }
+
+    }
 
     /**
      * Gets the number of items in the list
@@ -61,5 +76,17 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         // Holds the TextView that will add each item to
         val tvItem = view.tvItem
+
+
     }
+
+    fun setOnClickListener(onClickListener: OnClickListener) {
+        this.onClickListener = onClickListener
+    }
+
+    interface OnClickListener {
+        fun onClick(position: Int, model: String)
+    }
+
+    private class MyViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }

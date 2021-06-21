@@ -11,7 +11,7 @@ data class PhotoSizesModel(
         val candownload: Int,
         val canprint: Int,
         val size: List<Size>
-    ) : Serializable{
+    ) : Serializable {
         data class Size(
             val height: Int,
             val label: String,

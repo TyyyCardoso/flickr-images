@@ -9,6 +9,6 @@ import retrofit2.http.Query
 interface PhotoSizesService {
     @GET("?method=flickr.photos.getSizes&api_key=${Constants.APP_ID}&format=json&nojsoncallback=1")
     fun getInfo(
-        @Query("photo_id") photo_id : String,
-    ) : Call<PhotoSizesModel>
+        @Query("photo_id") photo_id: String,
+    ): Call<PhotoSizesModel>
 }
