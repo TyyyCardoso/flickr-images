@@ -1,11 +1,12 @@
 package azores.tyyy.cardoso.flickr_images.activities
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.AbsListView
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,7 +16,7 @@ import azores.tyyy.cardoso.flickr_images.constants.Constants
 import azores.tyyy.cardoso.flickr_images.models.*
 import azores.tyyy.cardoso.flickr_images.network.PhotoSearchService
 import azores.tyyy.cardoso.flickr_images.network.PhotoSizesService
-import com.squareup.picasso.Picasso
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -38,12 +39,16 @@ class MainActivity : AppCompatActivity() {
     private val itemAdapter = ItemAdapter(this, list)
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
 
-        getPhotoSearch()
+         if(Constants.isNetworkAvailable(this))
+            getPhotoSearch()
+        else
+            Toast.makeText(this, "No Internet Connection available", Toast.LENGTH_SHORT).show()
 
         // Set the LayoutManager that this RecyclerView will use.
         rvItemsList.layoutManager = GridLayoutManager(this, 2)
@@ -63,7 +68,10 @@ class MainActivity : AppCompatActivity() {
                     if (!isLoading) {
                         if ((visibleItemCount + pastVisibleItem) >= total) {
                             page++
-                            getPhotoSearch()
+                            if(Constants.isNetworkAvailable(this@MainActivity))
+                                getPhotoSearch()
+                            else
+                                Toast.makeText(this@MainActivity, "No Internet Connection available", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
