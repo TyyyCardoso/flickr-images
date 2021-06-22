@@ -7,8 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import azores.tyyy.cardoso.flickr_images.R
+import com.github.florent37.materialimageloading.MaterialImageLoading
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.items_row.view.*
+
 
 class ItemAdapter(val context: Context, val items: ArrayList<String>) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
@@ -47,7 +50,11 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        Picasso.get().load(item).into(holder.tvItem)
+        Picasso.get().load(item).into(holder.tvItem, object : Callback.EmptyCallback(){
+            override fun onSuccess() {
+                MaterialImageLoading.animate(holder.tvItem).setDuration(3000).start()
+            }
+        } )
 
         holder.tvItem.setOnClickListener {
             Log.i("WWT", "${item}")
@@ -89,4 +96,5 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
     }
 
     private class MyViewHolder(view: View) : RecyclerView.ViewHolder(view)
+
 }
