@@ -52,7 +52,7 @@ class SeePhotoBigSize : AppCompatActivity() {
             val imgFile: File =
                 File("/data/user/0/azores.tyyy.cardoso.flickr_images/app_FlickrImages/${url2Name}.jpg")
 
-            Log.i("WWTItem2", imgFile.toString())
+            Log.i("WWT_FilePath", imgFile.toString())
 
             if (imgFile.exists()) {
                 val myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
@@ -65,9 +65,12 @@ class SeePhotoBigSize : AppCompatActivity() {
                         }
                     })
 
-                var drawable = imgBig.getDrawable() as BitmapDrawable
-                var bitmap = drawable.bitmap
-                Log.i("WWTItem", "${saveImageToInternalStorage(bitmap, url2Name!!)}")
+                if(imgBig.getDrawable() != null){
+                    var drawable = imgBig.getDrawable() as BitmapDrawable
+                    var bitmap = drawable.bitmap
+                    //Log.i("WWTItem", "${saveImageToInternalStorage(bitmap, url2Name!!)}")
+                }
+
             }
 
         }
