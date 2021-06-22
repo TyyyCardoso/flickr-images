@@ -32,6 +32,7 @@ class SeePhotoBigSize : AppCompatActivity() {
         setContentView(R.layout.activity_see_photo_big_size)
 
 
+
         setSupportActionBar(toolbar_map)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.title = "Foto"

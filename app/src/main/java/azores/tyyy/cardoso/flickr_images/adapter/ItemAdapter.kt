@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.items_row.view.*
 
 
+
 class ItemAdapter(val context: Context, val items: ArrayList<String>) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
 
