@@ -61,7 +61,7 @@ class SeePhotoBigSize : AppCompatActivity() {
                 Picasso.get().load(url)
                     .into(imgBig, object : Callback.EmptyCallback() {
                         override fun onSuccess() {
-                            MaterialImageLoading.animate(imgBig).setDuration(3000).start()
+                            MaterialImageLoading.animate(imgBig).setDuration(2000).start()
                         }
                     })
 

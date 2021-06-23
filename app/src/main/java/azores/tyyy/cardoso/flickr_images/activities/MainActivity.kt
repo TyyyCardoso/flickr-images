@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity() {
     var photoSearchList: PhotoSearchModel? = null
     var photoSizesList: PhotoSizesModel? = null
 
+    var sp_check = false
+
     val list = ArrayList<String>()
 
     private val itemAdapter = ItemAdapter(this, list)
@@ -51,10 +53,13 @@ class MainActivity : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
 
+        itemAdapter.notifyDataSetChanged()
 
+        Log.i("ONCRR", "create")
 
 
          if(Constants.isNetworkAvailable(this)){
+             Constants.WAS_ONLINE = true
              searchTag(imgBtn)
          }
 
@@ -66,6 +71,8 @@ class MainActivity : AppCompatActivity() {
                     list.add(sp!!)
                  aux++
              }while(!sp.equals("Error"))
+             itemAdapter.notifyDataSetChanged()
+             sp_check = true
          }
         // Set the LayoutManager that this RecyclerView will use.
         rvItemsList.layoutManager = GridLayoutManager(this, 2)
@@ -77,9 +84,30 @@ class MainActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
                 if(Constants.isNetworkAvailable(this@MainActivity) && Constants.WAS_OFFLINE){
+                    Log.i("WWTt", "test")
+                    sp_check = false
                     list.clear()
                     itemAdapter.notifyDataSetChanged()
                     Constants.WAS_OFFLINE = false
+                }
+                if(!Constants.isNetworkAvailable(this@MainActivity)){
+                    aux = 1
+                    Constants.WAS_OFFLINE = true
+                    if(!sp_check){
+                        Constants.WAS_ONLINE = false
+                        list.clear()
+                        do{
+                            val sp = sharedPreferences.getString("$aux", "Error")
+                            if(!sp.equals("Error"))
+                                list.add(sp!!)
+                            aux++
+                        }while(!sp.equals("Error"))
+                        itemAdapter.notifyDataSetChanged()
+                        Log.i("OFFON", "P1")
+                        sp_check = true
+                    }
+
+
                 }
 
                 if (dy > 0) {
@@ -175,10 +203,15 @@ class MainActivity : AppCompatActivity() {
                         itemAdapter.setOnClickListener(object :
                             ItemAdapter.OnClickListener {
                             override fun onClick(position: Int, model: String) {
-                                val intent = Intent(this@MainActivity, SeePhotoBigSize::class.java)
-                                var modelFix = model.replace("_q","_b")
-                                intent.putExtra("url", modelFix)
-                                startActivity(intent)
+                                if(Constants.isNetworkAvailable(this@MainActivity)){
+                                    val intent = Intent(this@MainActivity, SeePhotoBigSize::class.java)
+                                    var modelFix = model.replace("_q","_b")
+                                    intent.putExtra("url", modelFix)
+                                    startActivity(intent)
+                                } else {
+                                    Toast.makeText(this@MainActivity, "No Internet Connection available", Toast.LENGTH_SHORT).show()
+                                }
+
                             }
                         })
 
@@ -221,13 +254,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun searchTag(view: View){
-        var tag = tag_name.text.toString()
-        list.clear()
-        itemAdapter.notifyDataSetChanged()
-        if(!tag.isEmpty())
-            getPhotoSearch(tag)
-        else{
-            getPhotoSearch()
+        if(Constants.isNetworkAvailable(this@MainActivity)){
+            var tag = tag_name.text.toString()
+            list.clear()
+            itemAdapter.notifyDataSetChanged()
+            if(!tag.isEmpty())
+                getPhotoSearch(tag)
+            else{
+                getPhotoSearch()
+            }
         }
+        else {
+            Toast.makeText(this@MainActivity, "No Internet Connection available", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    fun refresh(view: View) {
+        val intent = intent
+        finish()
+        startActivity(intent)
+        overridePendingTransition(0, 0);
     }
 }

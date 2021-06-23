@@ -58,7 +58,7 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
         if(Constants.isNetworkAvailable(context)){
             Picasso.get().load(item).into(holder.tvItem, object : Callback.EmptyCallback(){
                 override fun onSuccess() {
-                    MaterialImageLoading.animate(holder.tvItem).setDuration(3000).start()
+                    MaterialImageLoading.animate(holder.tvItem).setDuration(1500).start()
                 }
             } )
         }else{
