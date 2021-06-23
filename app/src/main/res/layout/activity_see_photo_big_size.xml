@@ -16,8 +16,8 @@
 
     <ImageView
         android:id="@+id/imgBig"
-        android:layout_width="683px"
-        android:layout_height="1024px"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/ic_launcher_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

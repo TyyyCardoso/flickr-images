@@ -160,7 +160,8 @@ class MainActivity : AppCompatActivity() {
                             ItemAdapter.OnClickListener {
                             override fun onClick(position: Int, model: String) {
                                 val intent = Intent(this@MainActivity, SeePhotoBigSize::class.java)
-                                intent.putExtra("url", model)
+                                var modelFix = model.replace("_q","_b")
+                                intent.putExtra("url", modelFix)
                                 startActivity(intent)
                             }
                         })

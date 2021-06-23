@@ -67,13 +67,13 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
 
         
         holder.tvItem.setOnClickListener {
-            Log.i("WWT", "${item}")
+            //Log.i("WWT", "${item}")
 
             onClickListener = onClickListener
 
             if (onClickListener != null) {
                 onClickListener!!.onClick(position, item)
-                Log.i("WWT2", "${item}")
+                Log.i("WWT_PhotoClick", "${item}")
 
             }
         }
