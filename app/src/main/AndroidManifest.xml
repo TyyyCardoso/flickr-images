@@ -15,8 +15,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FlickrImages">
-        <activity android:name=".activities.SeePhotoBigSize"
-            android:theme="@style/CustomNoActionBarTheme"></activity>
+        <activity android:name=".activities.SplashScreen" android:screenOrientation="portrait" android:theme="@style/Theme.MaterialComponents.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.SeePhotoBigSize"
+            android:theme="@style/CustomNoActionBarTheme" />
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
