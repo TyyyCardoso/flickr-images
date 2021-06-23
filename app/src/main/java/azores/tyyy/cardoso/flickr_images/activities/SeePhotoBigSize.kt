@@ -97,7 +97,6 @@ class SeePhotoBigSize : AppCompatActivity() {
         return Uri.parse(file.absolutePath)
     }
 
-
     companion object {
         private const val IMAGE_DIRECTORY = "FlickrImages"
     }

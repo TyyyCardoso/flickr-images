@@ -1,11 +1,12 @@
 package azores.tyyy.cardoso.flickr_images.activities
 
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,8 +17,10 @@ import azores.tyyy.cardoso.flickr_images.constants.Constants
 import azores.tyyy.cardoso.flickr_images.models.*
 import azores.tyyy.cardoso.flickr_images.network.PhotoSearchService
 import azores.tyyy.cardoso.flickr_images.network.PhotoSizesService
-import com.google.android.material.snackbar.Snackbar
+import azores.tyyy.cardoso.flickr_images.utils.Utils
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_see_photo_big_size.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,7 +30,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var customProgressDialog: Dialog
+    private lateinit var sharedPreferences: SharedPreferences
+
+    var aux = 1
 
     var page = 1
     var isLoading = false
@@ -39,17 +44,23 @@ class MainActivity : AppCompatActivity() {
     private val itemAdapter = ItemAdapter(this, list)
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        sharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
+
 
          if(Constants.isNetworkAvailable(this))
             getPhotoSearch()
-        else
-            Toast.makeText(this, "No Internet Connection available", Toast.LENGTH_SHORT).show()
-
+         else {
+             do{
+                 val sp = sharedPreferences.getString("$aux", "Error")
+                 if(!sp.equals("Error"))
+                    list.add(sp!!)
+                 aux++
+             }while(!sp.equals("Error"))
+         }
         // Set the LayoutManager that this RecyclerView will use.
         rvItemsList.layoutManager = GridLayoutManager(this, 2)
         // Adapter class is initialized and list is passed in the param.
@@ -142,6 +153,7 @@ class MainActivity : AppCompatActivity() {
 
                         photoSizesList = response.body()
                         list.add(photoSizesList!!.sizes.size[1].source)
+                        getBitmapFromURL(photoSizesList!!.sizes.size[1].source)
                         itemAdapter.notifyDataSetChanged()
 
                         itemAdapter.setOnClickListener(object :
@@ -165,6 +177,29 @@ class MainActivity : AppCompatActivity() {
             })
         }
         isLoading = false
+
+    }
+
+    private fun getBitmapFromURL(string : String) {
+        Picasso.get().load(string).into(object: com.squareup.picasso.Target {
+            override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
+                Log.i("ERROR", "ERROR - $string")
+            }
+
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                Log.i("LOADED", "LOADED - $string")
+            }
+
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                Log.i("BITMAP", "$aux - $bitmap")
+                val editor = sharedPreferences.edit()
+                editor.putString("$aux", Utils.BitmapToBASE64(bitmap))
+                Log.i("EDITOR", "$aux - ${Utils.BitmapToBASE64(bitmap)}")
+                editor.apply()
+                aux++
+            }
+        })
+
 
     }
 
