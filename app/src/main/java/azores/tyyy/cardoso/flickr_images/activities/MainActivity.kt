@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -51,8 +52,10 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
 
 
+
+
          if(Constants.isNetworkAvailable(this)){
-             getPhotoSearch()
+             searchTag(imgBtn)
          }
 
          else {
@@ -73,14 +76,11 @@ class MainActivity : AppCompatActivity() {
         rvItemsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
-                if(Constants.isNetworkAvailable(this@MainActivity) && (Constants.WAS_OFFLINE)){
+                if(Constants.isNetworkAvailable(this@MainActivity) && Constants.WAS_OFFLINE){
                     list.clear()
                     itemAdapter.notifyDataSetChanged()
                     Constants.WAS_OFFLINE = false
                 }
-
-
-
 
                 if (dy > 0) {
                     val visibleItemCount = rvItemsList.childCount
@@ -92,7 +92,10 @@ class MainActivity : AppCompatActivity() {
                         if ((visibleItemCount + pastVisibleItem) >= total) {
                             page++
                             if(Constants.isNetworkAvailable(this@MainActivity))
-                                getPhotoSearch()
+                                if(tag_name.text.toString().isNotEmpty())
+                                    getPhotoSearch(tag_name.text.toString())
+                                else
+                                    getPhotoSearch()
                             else
                                 Toast.makeText(this@MainActivity, "No Internet Connection available", Toast.LENGTH_SHORT).show()
                         }
@@ -107,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getPhotoSearch() {
+    private fun getPhotoSearch(tag : String = "ocean") {
         isLoading = true
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
@@ -117,7 +120,8 @@ class MainActivity : AppCompatActivity() {
         val service: PhotoSearchService =
             retrofit.create<PhotoSearchService>(PhotoSearchService::class.java)
 
-        val listCall: Call<PhotoSearchModel> = service.getInfo(page)
+        Log.i("PAGE", "$page")
+        val listCall: Call<PhotoSearchModel> = service.getInfo(page, tag)
 
 
         listCall.enqueue(object : Callback<PhotoSearchModel> {
@@ -216,9 +220,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun clear() {
+    fun searchTag(view: View){
+        var tag = tag_name.text.toString()
         list.clear()
         itemAdapter.notifyDataSetChanged()
+        if(!tag.isEmpty())
+            getPhotoSearch(tag)
+        else{
+            getPhotoSearch()
+        }
     }
-
 }

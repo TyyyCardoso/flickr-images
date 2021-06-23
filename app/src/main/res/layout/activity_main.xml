@@ -7,25 +7,35 @@
     tools:context=".activities.MainActivity"
     android:orientation="vertical">
 
-
-    <ImageView
-        android:id="@+id/img"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher_background"
-        android:visibility="gone"/>
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/tag_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Tags..."
+            android:textColor="#363A43"
+            android:textColorHint="#7A8089"/>
+
+        <ImageButton
+            android:id="@+id/imgBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/search_icon"
+            android:onClick="searchTag"/>
+</LinearLayout>
+
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvItemsList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        />
-
-    <ImageView
-        android:id="@+id/imgD"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         />
 
     <ProgressBar
