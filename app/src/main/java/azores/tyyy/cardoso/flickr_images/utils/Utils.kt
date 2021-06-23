@@ -1,6 +1,5 @@
 package azores.tyyy.cardoso.flickr_images.utils
 
-import android.R.string
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.*

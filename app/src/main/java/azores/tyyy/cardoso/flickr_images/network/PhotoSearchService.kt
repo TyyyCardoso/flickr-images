@@ -2,7 +2,6 @@ package azores.tyyy.cardoso.flickr_images.network
 
 import azores.tyyy.cardoso.flickr_images.constants.Constants
 import azores.tyyy.cardoso.flickr_images.models.PhotoSearchModel
-import azores.tyyy.cardoso.flickr_images.models.PhotoSizesModel
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

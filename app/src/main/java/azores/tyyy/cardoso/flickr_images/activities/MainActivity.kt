@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -31,18 +30,21 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
+    private var WAS_OFFLINE = false
+
     private lateinit var sharedPreferences: SharedPreferences
 
-    var aux = 1
+    private var aux = 1
 
-    var page = 1
-    var isLoading = false
-    var photoSearchList: PhotoSearchModel? = null
-    var photoSizesList: PhotoSizesModel? = null
+    private var page = 1
+    private var isLoading = false
 
-    var sp_check = false
+    private var photoSearchList: PhotoSearchModel? = null
+    private var photoSizesList: PhotoSizesModel? = null
 
-    val list = ArrayList<String>()
+    private var SP_CHECK = false
+
+    private val list = ArrayList<String>()
 
     private val itemAdapter = ItemAdapter(this, list)
 
@@ -53,61 +55,34 @@ class MainActivity : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
 
-        itemAdapter.notifyDataSetChanged()
+        if(Constants.isNetworkAvailable(this)) {
+            searchTag(imgBtn)
+        } else {
+            sharedPreferencesInput()
+            WAS_OFFLINE = true
+            SP_CHECK = true
 
-        Log.i("ONCRR", "create")
+        }
 
-
-         if(Constants.isNetworkAvailable(this)){
-             Constants.WAS_ONLINE = true
-             searchTag(imgBtn)
-         }
-
-         else {
-             Constants.WAS_OFFLINE = true
-             do{
-                 val sp = sharedPreferences.getString("$aux", "Error")
-                 if(!sp.equals("Error"))
-                    list.add(sp!!)
-                 aux++
-             }while(!sp.equals("Error"))
-             itemAdapter.notifyDataSetChanged()
-             sp_check = true
-         }
-        // Set the LayoutManager that this RecyclerView will use.
         rvItemsList.layoutManager = GridLayoutManager(this, 2)
-        // Adapter class is initialized and list is passed in the param.
-        // adapter instance is set to the recyclerview to inflate the items.
         rvItemsList.adapter = itemAdapter
 
         rvItemsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
-                if(Constants.isNetworkAvailable(this@MainActivity) && Constants.WAS_OFFLINE){
-                    Log.i("WWTt", "test")
-                    sp_check = false
+                if(Constants.isNetworkAvailable(this@MainActivity) && WAS_OFFLINE){
+                    SP_CHECK = false
                     list.clear()
                     itemAdapter.notifyDataSetChanged()
-                    Constants.WAS_OFFLINE = false
+                    WAS_OFFLINE = false
                 }
                 if(!Constants.isNetworkAvailable(this@MainActivity)){
-                    aux = 1
-                    Constants.WAS_OFFLINE = true
-                    if(!sp_check){
-                        Constants.WAS_ONLINE = false
+                    WAS_OFFLINE = true
+                    if(!SP_CHECK){
                         list.clear()
-                        do{
-                            val sp = sharedPreferences.getString("$aux", "Error")
-                            if(!sp.equals("Error"))
-                                list.add(sp!!)
-                            aux++
-                        }while(!sp.equals("Error"))
-                        itemAdapter.notifyDataSetChanged()
-                        Log.i("OFFON", "P1")
-                        sp_check = true
+                        sharedPreferencesInput()
+                        SP_CHECK = true
                     }
-
-
                 }
 
                 if (dy > 0) {
@@ -138,6 +113,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun sharedPreferencesInput(aux : Int = 1){
+        var localAux = aux
+        do{
+            val sp = sharedPreferences.getString("$localAux", "Error")
+            if(!sp.equals("Error"))
+                list.add(sp!!)
+            localAux++
+        }while(!sp.equals("Error"))
+        itemAdapter.notifyDataSetChanged()
+    }
+
     private fun getPhotoSearch(tag : String = "ocean") {
         isLoading = true
         val retrofit: Retrofit = Retrofit.Builder()
@@ -148,7 +134,6 @@ class MainActivity : AppCompatActivity() {
         val service: PhotoSearchService =
             retrofit.create<PhotoSearchService>(PhotoSearchService::class.java)
 
-        Log.i("PAGE", "$page")
         val listCall: Call<PhotoSearchModel> = service.getInfo(page, tag)
 
 
@@ -159,15 +144,11 @@ class MainActivity : AppCompatActivity() {
             ) {
                 if (response!!.isSuccessful) {
                     photoSearchList = response.body()
-                    Log.i("WWT", "$photoSearchList")
                     getSizesSearch()
-                } else {
-                    Log.i("WWT", response.code().toString())
                 }
             }
 
             override fun onFailure(call: Call<PhotoSearchModel>, t: Throwable) {
-                Log.i("WWT", t!!.message.toString())
             }
 
         })
@@ -215,13 +196,10 @@ class MainActivity : AppCompatActivity() {
                             }
                         })
 
-                    } else {
-                        Log.i("WWTe", response.code().toString())
                     }
                 }
 
                 override fun onFailure(call: Call<PhotoSizesModel>, t: Throwable) {
-                    Log.i("WWTd", t!!.message.toString())
                 }
 
             })
@@ -233,18 +211,15 @@ class MainActivity : AppCompatActivity() {
     private fun getBitmapFromURL(string : String) {
         Picasso.get().load(string).into(object: com.squareup.picasso.Target {
             override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
-                Log.i("ERROR", "ERROR - $string")
+
             }
 
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                Log.i("LOADED", "LOADED - $string")
             }
 
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                Log.i("BITMAP", "$aux - $bitmap")
                 val editor = sharedPreferences.edit()
                 editor.putString("$aux", Utils.BitmapToBASE64(bitmap))
-                Log.i("EDITOR", "$aux - ${Utils.BitmapToBASE64(bitmap)}")
                 editor.apply()
                 aux++
             }

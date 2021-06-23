@@ -1,9 +1,6 @@
 package azores.tyyy.cardoso.flickr_images.adapter
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,15 +12,13 @@ import com.github.florent37.materialimageloading.MaterialImageLoading
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.items_row.view.*
-import java.io.ByteArrayInputStream
-import java.io.InputStream
+
 
 
 class ItemAdapter(val context: Context, val items: ArrayList<String>) :
     RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
-
 
     /**
      * Inflates the item views which is designed in xml layout file
@@ -64,20 +59,13 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
         }else{
             holder.tvItem.setImageBitmap(Utils.BASE64ToBitmap(item))
         }
-
         
         holder.tvItem.setOnClickListener {
-            //Log.i("WWT", "${item}")
-
             onClickListener = onClickListener
-
             if (onClickListener != null) {
                 onClickListener!!.onClick(position, item)
-                Log.i("WWT_PhotoClick", "${item}")
-
             }
         }
-
     }
 
     /**

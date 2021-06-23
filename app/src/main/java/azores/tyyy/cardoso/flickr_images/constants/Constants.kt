@@ -12,9 +12,6 @@ object Constants {
 
     const val PREFERENCE_NAME = "FlickrAppPreference"
 
-    var WAS_OFFLINE = false
-    var WAS_ONLINE = false
-
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE)
                 as ConnectivityManager
