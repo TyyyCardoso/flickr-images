@@ -18,10 +18,13 @@ object Utils {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    fun BASE64ToBitmap(image: String): Bitmap {
+    fun BASE64ToBitmap(image: String): Bitmap? {
         val imageByte: ByteArray = Base64.decode(image, Base64.NO_WRAP)
         val inputStream: InputStream = ByteArrayInputStream(imageByte)
         val bmp = BitmapFactory.decodeStream(inputStream)
-        return bmp
+        if (bmp != null)
+            return bmp
+        else
+            return null
     }
 }

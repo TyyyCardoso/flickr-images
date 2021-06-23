@@ -51,9 +51,12 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
 
 
-         if(Constants.isNetworkAvailable(this))
-            getPhotoSearch()
+         if(Constants.isNetworkAvailable(this)){
+             getPhotoSearch()
+         }
+
          else {
+             Constants.WAS_OFFLINE = true
              do{
                  val sp = sharedPreferences.getString("$aux", "Error")
                  if(!sp.equals("Error"))
@@ -69,6 +72,15 @@ class MainActivity : AppCompatActivity() {
 
         rvItemsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+                if(Constants.isNetworkAvailable(this@MainActivity) && (Constants.WAS_OFFLINE)){
+                    list.clear()
+                    itemAdapter.notifyDataSetChanged()
+                    Constants.WAS_OFFLINE = false
+                }
+
+
+
 
                 if (dy > 0) {
                     val visibleItemCount = rvItemsList.childCount
@@ -202,6 +214,11 @@ class MainActivity : AppCompatActivity() {
         })
 
 
+    }
+
+    fun clear() {
+        list.clear()
+        itemAdapter.notifyDataSetChanged()
     }
 
 }

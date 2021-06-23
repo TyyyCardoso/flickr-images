@@ -11,7 +11,8 @@ object Constants {
     const val BASE_URL: String = "https://api.flickr.com/services/rest/"
 
     const val PREFERENCE_NAME = "FlickrAppPreference"
-    const val FLICKR_DATA = "flickr_response_data"
+
+    var WAS_OFFLINE = false
 
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE)
