@@ -15,6 +15,11 @@ class SeePhotoBigSize : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_see_photo_big_size)
 
+        /**
+         *
+         * Define a toolbar with back button
+         *
+         */
         setSupportActionBar(toolbar_map)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.title = "Foto"
@@ -23,6 +28,7 @@ class SeePhotoBigSize : AppCompatActivity() {
             onBackPressed()
         }
 
+        //if has internet, the image is loaded from url with picasso library
         if (intent.hasExtra("url")) {
             Picasso.get().load(intent.getStringExtra("url"))
                 .into(imgBig, object : Callback.EmptyCallback() {

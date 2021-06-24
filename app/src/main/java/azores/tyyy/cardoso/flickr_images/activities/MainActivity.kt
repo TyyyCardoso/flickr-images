@@ -55,27 +55,32 @@ class MainActivity : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
 
+        //if has internet search for new images
         if(Constants.isNetworkAvailable(this)) {
             searchTag(imgBtn)
         } else {
+            //if has no internet load images saved in sharedPreferences
             sharedPreferencesInput()
             WAS_OFFLINE = true
             SP_CHECK = true
 
         }
 
+        //configuration of recycler view
         rvItemsList.layoutManager = GridLayoutManager(this, 2)
         rvItemsList.adapter = itemAdapter
 
         rvItemsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
+                //check if internet is turn to on
                 if(Constants.isNetworkAvailable(this@MainActivity) && WAS_OFFLINE){
                     SP_CHECK = false
                     list.clear()
                     itemAdapter.notifyDataSetChanged()
                     WAS_OFFLINE = false
                 }
+
                 if(!Constants.isNetworkAvailable(this@MainActivity)){
                     WAS_OFFLINE = true
                     if(!SP_CHECK){
@@ -85,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
+                //if scroll is detected (dy > 0)
                 if (dy > 0) {
                     val visibleItemCount = rvItemsList.childCount
                     val pastVisibleItem =
@@ -92,6 +98,7 @@ class MainActivity : AppCompatActivity() {
                     val total = itemAdapter.itemCount
 
                     if (!isLoading) {
+                        //check if there are more items below
                         if ((visibleItemCount + pastVisibleItem) >= total) {
                             page++
                             if(Constants.isNetworkAvailable(this@MainActivity))
@@ -113,6 +120,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    /**
+     *
+     * This method get the sharedPreferences
+     * and adds it to the recycler view list
+     *
+     */
     private fun sharedPreferencesInput(aux : Int = 1){
         var localAux = aux
         do{
@@ -124,24 +137,46 @@ class MainActivity : AppCompatActivity() {
         itemAdapter.notifyDataSetChanged()
     }
 
+    /**
+     * Function is used to get photo details
+     */
     private fun getPhotoSearch(tag : String = "ocean") {
         isLoading = true
+        /**
+         * Add the built-in converter factory first. This prevents overriding its
+         * behavior but also ensures correct behavior when using converters that consume all types.
+         */
         val retrofit: Retrofit = Retrofit.Builder()
+            // API base URL.
             .baseUrl(Constants.BASE_URL)
+            /** Add converter factory for serialization and deserialization of objects. */
+            /**
+             * Create an instance using a default {@link Gson} instance for conversion. Encoding to JSON and
+             * decoding from JSON (when no charset is specified by a header) will use UTF-8.
+             */
             .addConverterFactory(GsonConverterFactory.create())
+            /** Create the Retrofit instances. */
             .build()
 
+        /**
+         * Here we map the service interface in which we declares the end point and the API type
+         *i.e GET, POST and so on along with the request parameter which are required.
+         */
         val service: PhotoSearchService =
             retrofit.create<PhotoSearchService>(PhotoSearchService::class.java)
 
+        /** An invocation of a Retrofit method that sends a request to a web-server and returns a response.
+         * Here we pass the required param in the service
+         */
         val listCall: Call<PhotoSearchModel> = service.getInfo(page, tag)
 
-
+        // Callback methods are executed using the Retrofit callback executor.
         listCall.enqueue(object : Callback<PhotoSearchModel> {
             override fun onResponse(
                 call: Call<PhotoSearchModel>,
                 response: Response<PhotoSearchModel>
             ) {
+                // Check the response is success or not.
                 if (response!!.isSuccessful) {
                     photoSearchList = response.body()
                     getSizesSearch()
@@ -154,19 +189,37 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * Function is used to get photos
+     */
     private fun getSizesSearch() {
-
-
+        /**
+         * Add the built-in converter factory first. This prevents overriding its
+         * behavior but also ensures correct behavior when using converters that consume all types.
+         */
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
+            /** Add converter factory for serialization and deserialization of objects. */
+            /**
+             * Create an instance using a default {@link Gson} instance for conversion. Encoding to JSON and
+             * decoding from JSON (when no charset is specified by a header) will use UTF-8.
+             */
             .addConverterFactory(GsonConverterFactory.create())
+            /** Create the Retrofit instances. */
             .build()
 
+        /**
+         * Here we map the service interface in which we declares the end point and the API type
+         *i.e GET, POST and so on along with the request parameter which are required.
+         */
         val service: PhotoSizesService =
             retrofit.create<PhotoSizesService>(PhotoSizesService::class.java)
 
         for (item in photoSearchList!!.photos.photo) {
 
+            /** An invocation of a Retrofit method that sends a request to a web-server and returns a response.
+             * Here we pass the required param in the service
+             */
             val listCall: Call<PhotoSizesModel> = service.getInfo(item.id)
 
             listCall.enqueue(object : Callback<PhotoSizesModel> {
@@ -175,17 +228,31 @@ class MainActivity : AppCompatActivity() {
                     response: Response<PhotoSizesModel>
                 ) {
                     if (response!!.isSuccessful) {
-
                         photoSizesList = response.body()
+                        //add photos url to recycler view data list
                         list.add(photoSizesList!!.sizes.size[1].source)
+                        //get bitmap from url and saves it in sharedPreferences
                         getBitmapFromURL(photoSizesList!!.sizes.size[1].source)
+
                         itemAdapter.notifyDataSetChanged()
 
                         itemAdapter.setOnClickListener(object :
                             ItemAdapter.OnClickListener {
+                            //View photo in bigger size
                             override fun onClick(position: Int, model: String) {
                                 if(Constants.isNetworkAvailable(this@MainActivity)){
                                     val intent = Intent(this@MainActivity, SeePhotoBigSize::class.java)
+                                    /**
+                                     *
+                                     * for the same photo there are different sizes
+                                     * but all photos have a unique ID
+                                     * so the only difference in the URl is the character which reference the image size
+                                     * EXAMPLE:
+                                     * https://live.staticflickr.com/8424/7803551540_8c6211646e_b.jpg
+                                     * https://live.staticflickr.com/8424/7803551540_8c6211646e_q.jpg
+                                     * so we use replace built in function to change the url from "..._q" to "..._b"
+                                     *
+                                     */
                                     var modelFix = model.replace("_q","_b")
                                     intent.putExtra("url", modelFix)
                                     startActivity(intent)
@@ -208,6 +275,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    /**
+     *
+     * Receives a URL as a string
+     * converts it to a Bitmap
+     * and saves it in sharedPreferences
+     *
+     */
     private fun getBitmapFromURL(string : String) {
         Picasso.get().load(string).into(object: com.squareup.picasso.Target {
             override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
@@ -224,10 +298,15 @@ class MainActivity : AppCompatActivity() {
                 aux++
             }
         })
-
-
     }
 
+    /**
+     *
+     * Check if has internet
+     * and gets tags from EditText
+     * then sends it to getPhotoSearch method
+     *
+     */
     fun searchTag(view: View){
         if(Constants.isNetworkAvailable(this@MainActivity)){
             var tag = tag_name.text.toString()
@@ -245,6 +324,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    /**
+     *
+     * Restarts the activity
+     *
+     */
     fun refresh(view: View) {
         val intent = intent
         finish()

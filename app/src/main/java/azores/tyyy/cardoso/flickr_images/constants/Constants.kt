@@ -6,12 +6,27 @@ import android.net.NetworkCapabilities
 import android.os.Build
 
 object Constants {
-    //API KEY
+    /**
+     *
+     * Declaration of API KEY
+     * and BASE URL
+     *
+     */
     const val APP_ID: String = "7bdb03d29144dbbabc9c71fd173ac356"
     const val BASE_URL: String = "https://api.flickr.com/services/rest/"
 
+    /**
+     *
+     * Declaration of sharedPreferences name object
+     *
+     */
     const val PREFERENCE_NAME = "FlickrAppPreference"
 
+    /**
+     *
+     * Check if has internet
+     *
+     */
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE)
                 as ConnectivityManager
@@ -30,7 +45,5 @@ object Constants {
             val networkInfo = connectivityManager.activeNetworkInfo
             return networkInfo != null && networkInfo.isConnectedOrConnecting
         }
-
-
     }
 }

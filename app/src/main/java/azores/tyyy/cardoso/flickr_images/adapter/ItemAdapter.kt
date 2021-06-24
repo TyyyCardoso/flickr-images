@@ -50,16 +50,19 @@ class ItemAdapter(val context: Context, val items: ArrayList<String>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
 
+        //if has internet, images are loaded from url with picasso library
         if(Constants.isNetworkAvailable(context)){
             Picasso.get().load(item).into(holder.tvItem, object : Callback.EmptyCallback(){
                 override fun onSuccess() {
+                    //Uses MaterialImageLoading library to create an animation
                     MaterialImageLoading.animate(holder.tvItem).setDuration(1500).start()
                 }
             } )
         }else{
+            //if has no internet, images are loaded from sharedPreferences as bitmap objets
             holder.tvItem.setImageBitmap(Utils.BASE64ToBitmap(item))
         }
-        
+
         holder.tvItem.setOnClickListener {
             onClickListener = onClickListener
             if (onClickListener != null) {
