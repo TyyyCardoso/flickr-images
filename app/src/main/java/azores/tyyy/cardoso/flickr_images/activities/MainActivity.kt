@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,6 +19,7 @@ import azores.tyyy.cardoso.flickr_images.models.*
 import azores.tyyy.cardoso.flickr_images.network.PhotoSearchService
 import azores.tyyy.cardoso.flickr_images.network.PhotoSizesService
 import azores.tyyy.cardoso.flickr_images.utils.Utils
+import azores.tyyy.cardoso.flickr_images.utils.Validation
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_see_photo_big_size.*
@@ -307,19 +309,32 @@ class MainActivity : AppCompatActivity() {
      * then sends it to getPhotoSearch method
      *
      */
-    fun searchTag(view: View){
-        if(Constants.isNetworkAvailable(this@MainActivity)){
+    fun searchTag(view: View) {
+        hideSoftKeyboard(imgBtn)
+        if (Constants.isNetworkAvailable(this@MainActivity)) {
             var tag = tag_name.text.toString()
             list.clear()
             itemAdapter.notifyDataSetChanged()
-            if(!tag.isEmpty())
-                getPhotoSearch(tag)
-            else{
-                getPhotoSearch()
+            if(Validation.searchTagValidation(tag)){
+                if (tag.isNotEmpty())
+                    getPhotoSearch(tag)
+                else
+                    getPhotoSearch()
+
+            }else{
+                tag_name.error = "Your tag must be more than 2 and less than 11 characters and have no punctuation"
+                Toast.makeText(
+                    this@MainActivity,
+                    "Insert a valid tag",
+                    Toast.LENGTH_LONG
+                ).show()
             }
-        }
-        else {
-            Toast.makeText(this@MainActivity, "No Internet Connection available", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(
+                this@MainActivity,
+                "No Internet Connection available",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
     }
@@ -334,5 +349,16 @@ class MainActivity : AppCompatActivity() {
         finish()
         startActivity(intent)
         overridePendingTransition(0, 0);
+    }
+
+    /**
+     *
+     * Hide Keyboard for better aspect
+     *
+     */
+    fun hideSoftKeyboard(view: View) {
+        val imm =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
